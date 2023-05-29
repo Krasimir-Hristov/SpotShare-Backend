@@ -25,6 +25,10 @@ router.get('/:placeId', (req, res, next) => {
         return p.id === placeId;
     });
 
+    if (!place) {
+        res.status(404).json({message: 'Could not find a place for the provided id.'});
+    }
+
     res.json({ place });
 });
 
