@@ -117,19 +117,19 @@ const createPlace = async (req, res, next) => {
     try {
         const currentSession = await mongoose.startSession();
         currentSession.startTransaction();
-    
+
         await createdPlace.save({ session: currentSession }); // Правилно: използвай 'createdPlace', не 'createPlace'
         user.places.push(createdPlace);
-    
+
         await user.save({ session: currentSession });
-    
+
         await currentSession.commitTransaction();
     } catch (err) {
         const error = new HttpError('Creating place failed, please try again.', 500);
-    
+
         return next(error);
     };
-    
+
 
     res.status(201).json({ place: createdPlace });
 };
@@ -178,22 +178,32 @@ const deletePlace = async (req, res, next) => {
 
     try {
 
-        place = await Place.findById(placeId);
+        place = await Place.findById(placeId).populate('creator');
     } catch (err) {
 
         const error = new HttpError('Something went wrong, could not delete place', 500);
         return next(error);
     }
 
+    if (!place) {
 
+        const error = new HttpError('Could not find place for this id.', 404);
+        return next(error);
+    }
 
     try {
-        await Place.deleteOne({ _id: placeId });
+        // await Place.deleteOne({ _id: placeId });
+        const currentSession = await mongoose.startSession();
+        currentSession.startTransaction();
+        await place.deleteOne({ session: currentSession });
+
+        place.creator.places.pull(place);
+        await place.creator.save({ session: currentSession });
+        await currentSession.commitTransaction();
     } catch (err) {
         const error = new HttpError('Something went wrong, could not delete place', 500);
         return next(error);
     }
-
 
 
     res.status(200).json({ message: 'Your place was deleted!' });
