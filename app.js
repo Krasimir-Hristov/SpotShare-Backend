@@ -1,5 +1,7 @@
 const express = require("express");
+require('dotenv').config();
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const placesRoutes = require('./routes/places-routes');
 const usersRoutes = require('./routes/users-routes');
@@ -30,5 +32,15 @@ app.use((error, req, res, next) => {
 });
 
 
-app.listen(5000);
-console.log('Server listen on: http://localhost:5000');
+mongoose
+    .connect(process.env.MONGODB_URI)
+    .then(() => {
+        console.log('Database connected');
+    })
+    .then(() => {
+        app.listen(process.env.PORT);
+        console.log('Server listen on: http://localhost:5000');
+    })
+    .catch(error => {
+        console.log(error);
+    });
