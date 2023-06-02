@@ -1,10 +1,12 @@
 // const { v4: uuidv4, v4 } = require('uuid');
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 
 const HttpError = require('../models/http-error');
 const getCoordsForAddress = require('../util/location');
 const Place = require('../models/place');
+const User = require('../models/user');
 
 // let DUMMY_PLACES = [
 
@@ -96,13 +98,38 @@ const createPlace = async (req, res, next) => {
         creator
     });
 
+    let user = null;
+
     try {
-        await createdPlace.save();
+        user = await User.findById(creator);
+
     } catch (err) {
         const error = new HttpError('Creating place failed, please try again.', 500);
+        return next(error);
+    }
 
+    if (!user) {
+        const error = new HttpError('Could not find user for provided id', 404);
+        return next(error);
+    }
+
+
+    try {
+        const currentSession = await mongoose.startSession();
+        currentSession.startTransaction();
+    
+        await createdPlace.save({ session: currentSession }); // Правилно: използвай 'createdPlace', не 'createPlace'
+        user.places.push(createdPlace);
+    
+        await user.save({ session: currentSession });
+    
+        await currentSession.commitTransaction();
+    } catch (err) {
+        const error = new HttpError('Creating place failed, please try again.', 500);
+    
         return next(error);
     };
+    
 
     res.status(201).json({ place: createdPlace });
 };
@@ -112,7 +139,7 @@ const updatePlace = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
 
-        return next(new HttpError('Invalid inputs passed, please check your data.', 422)); 
+        return next(new HttpError('Invalid inputs passed, please check your data.', 422));
     };
 
     const { title, description } = req.body;
