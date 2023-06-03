@@ -196,6 +196,7 @@ const deletePlace = async (req, res, next) => {
 
 
 
+
 module.exports = {
     getPlaceById,
     getPlacesByUserId,
