@@ -1,24 +1,29 @@
-const HttpError = require("../models/http-error");
 const jwt = require('jsonwebtoken');
+
+const HttpError = require('../models/http-error');
 
 module.exports = (req, res, next) => {
 
-    try {
+  if (req.method === 'OPTIONS') {
 
-        const token = req.headers.authorization.split(' ')[1];
+    return next();
+  }
 
-        if (!token) {
+  try {
 
-            throw new Error('Authrntication failed!');
-        }
+    const token = req.headers.authorization.split(' ')[1];
 
-        const decodedToken = jwt.verify(token, 'spotshare_password');
-        req.userData = { userId: decodedToken.userId };
-        next();
-    } catch (err) {
-
-        const error = new HttpError('Authrntication failed!', 401);
-        next(error);
+    if (!token) {
+      throw new Error('Authentication failed!');
     }
 
+    const decodedToken = jwt.verify(token, 'supersecret_dont_share');
+    req.userData = { userId: decodedToken.userId };
+    next();
+
+  } catch (err) {
+
+    const error = new HttpError('Authentication failed!', 401);
+    return next(error);
+  }
 };
