@@ -203,6 +203,7 @@ const deletePlace = async (req, res, next) => {
         await place.creator.save({ session: currentSession });
         await currentSession.commitTransaction();
     } catch (err) {
+
         const error = new HttpError('Something went wrong, could not delete place', 500);
         return next(error);
     }
@@ -219,6 +220,7 @@ const deletePlace = async (req, res, next) => {
 
 
 module.exports = {
+    
     getPlaceById,
     getPlacesByUserId,
     createPlace,
