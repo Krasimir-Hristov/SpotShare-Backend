@@ -124,6 +124,7 @@ const createPlace = async (req, res, next) => {
 const updatePlace = async (req, res, next) => {
 
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
 
         return next(new HttpError('Invalid inputs passed, please check your data.', 422));
@@ -139,6 +140,12 @@ const updatePlace = async (req, res, next) => {
     } catch (err) {
 
         const error = new HttpError('Something wnt wrong, could not update place.', 500);
+        return next(error);
+    }
+
+    if (place.creator.toString() !== req.userData.userId) {
+
+        const error = new HttpError('You are not allowed to edit this place.', 401);
         return next(error);
     }
 
@@ -178,6 +185,12 @@ const deletePlace = async (req, res, next) => {
         return next(error);
     }
 
+    if (place.creator.id !== req.userData.userId) {
+
+        const error = new HttpError('You are not allowed to delete this place.', 401);
+        return next(error);
+    }
+
     const imagePath = place.image;
 
     try {
@@ -195,10 +208,10 @@ const deletePlace = async (req, res, next) => {
     }
 
     fs.unlink(imagePath, err => {
-        
+
         console.log(err);
     });
-    
+
     res.status(200).json({ message: 'Your place was deleted!' });
 };
 
