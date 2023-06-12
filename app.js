@@ -64,7 +64,7 @@ mongoose
         console.log('Database connected');
     })
     .then(() => {
-        app.listen(process.env.PORT || 5000);
+        app.listen(process.env.PORT);
         console.log('Server listen on: http://localhost:5000');
     })
     .catch(error => {
