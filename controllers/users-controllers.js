@@ -83,7 +83,7 @@ const signup = async (req, res, next) => {
                 userId: createdUser.id,
                 email: createdUser.email
             },
-            'spotshare_password',
+            process.env.JWT_KEY,
             { expiresIn: '1h' }
         );
     } catch (err) {
@@ -141,7 +141,7 @@ const login = async (req, res, next) => {
                 userId: existingUser.id,
                 email: existingUser.email
             },
-            'spotshare_password',
+            process.env.JWT_KEY,
             { expiresIn: '1h' }
         );
     } catch (err) {

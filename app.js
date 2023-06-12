@@ -59,7 +59,7 @@ app.use((error, req, res, next) => {
 
 
 mongoose
-    .connect(process.env.MONGODB_URI)
+    .connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.re7ptkd.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`)
     .then(() => {
         console.log('Database connected');
     })
