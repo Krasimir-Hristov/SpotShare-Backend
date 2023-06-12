@@ -65,7 +65,6 @@ mongoose
     })
     .then(() => {
         app.listen(process.env.CYCLIC_URL || process.env.PORT);
-        console.log('Server listen on: http://localhost:5000');
     })
     .catch(error => {
         console.log(error);
