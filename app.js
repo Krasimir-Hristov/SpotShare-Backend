@@ -64,7 +64,7 @@ mongoose
         console.log('Database connected');
     })
     .then(() => {
-        app.listen(process.env.CYCLIC_URL || process.env.PORT);
+        app.listen(process.env.PORT);
     })
     .catch(error => {
         console.log(error);
