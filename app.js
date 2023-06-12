@@ -64,7 +64,8 @@ mongoose
         console.log('Database connected');
     })
     .then(() => {
-        app.listen(process.env.CYCLIC_URL);
+        app.listen(process.env.CYCLIC_URL || process.env.PORT);
+        console.log('Server listen on: http://localhost:5000');
     })
     .catch(error => {
         console.log(error);
